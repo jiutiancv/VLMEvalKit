@@ -8,8 +8,8 @@ from vlmeval.api.base import BaseAPI
 from vlmeval.dataset import DATASET_TYPE
 from vlmeval.dataset import img_root_map
 
-API_ENDPOINT = "https://hl.jiutian.10086.cn/kunlun/ingress/api/hl-4a9c15/7b11a3451e1a4612a6661c3e22235df6/ai-b6f55f2068a546498ebcfe4fc893ade8/service-97bc0f7b638041d18be4c5c7df31c359/v1/chat/completions"  # noqa: E501
-APP_CODE = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI2ZTNiMmQ5OWNiNTE0ZmQ0Yjk1M2M3YTg2NjQzNTFmOCIsImlzcyI6ImFwaS1hdXRoLWtleSIsImV4cCI6NDg5MDY4ODM2Nn0.GX61EKQ0hlQO4CisPwEwsAkmi7fvmc2Kl47EOq2IFpGWk9y4K1ocwM7aMbn7hJ-a4GkDoy3vyndTwPOFDn4y4t4J26tgwPziNS1-fUaQi6e1r7Dt372ZJEJgxxb99SkEulXrkOxOdwltJ87jnia7ZAyOzcfbQc6B4RdpCZERXn7Q-gED62emJbZ_8fuAu86lxtFUZ55lp8Jzmbu0QxNMR4c4Xy4tioxyfv5ZsFjo09GunDD875i__WFPEOl_I15NzhhOOGi3RKFVvZdTF4v3BCYNZoYF02pbM78XPkzcNxSpRHfjBKIjENBMEEygiZseGrcF6x-ThoTnjYsklu9HwA'  # noqa: E501
+API_ENDPOINT = "https://hl.jiutian.10086.cn/kunlun/ingress/api/hl-4a9c15/7b11a3451e1a4612a6661c3e22235df6/ai-e7d64e71b61e421b8a41c0d43424d73a/service-cd5a067331e34cfea25f5a9d7960ffe8//v1/chat/completions"
+APP_CODE = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI1YjYyODY0ZjZmMWI0Yzg4YWE2ZDk1NzBhNDY1MWI3OSIsImlzcyI6ImFwaS1hdXRoLWtleSIsImV4cCI6NDg5ODU1NzAwN30.jLUbctPdJ74VC3Vwlr0nB4x9N2QxWtSGYE0vWsceZN-agDecVnH8pH8Q5SoCQ3-SBYx5jDx-UOg3kkoMqY9CdxiALauKU_UZ56CV2NKCcHUVeJIgNvfQJMb0z6yCCbSe80e1T8FxrxQXDvubyWtl4pTAhixYaEUqNG8rjUrDuA-vRgZ1e7HilBmU487OI76D9LUnU-zEdMWhzsCkh_Yy3M1Ur4PsKgMFi5QSmMuGSUGJjkpJHiGNx1QcevBLQSOCL2jvg15ifB2n2dD6zb8iPXFkfQTtmvbZofxWACSvkri-x9V3gFWg7DODwKUZsyyogPzRJVbmxDGruMsgiiCsPg"
 
 
 class JTVLChatWrapper(BaseAPI):
@@ -74,7 +74,7 @@ class JTVLChatWrapper(BaseAPI):
 
     def use_custom_prompt(self, dataset):
         assert dataset is not None
-        if listinstr(['MMMU_DEV_VAL','MMMU_TEST'], dataset):
+        if listinstr(['MMMU_DEV_VAL', 'MMMU_TEST'], dataset):
             return False
         else:
             return True
@@ -154,7 +154,7 @@ class JTVLChatWrapper(BaseAPI):
                 image = [x['value'] for x in message if x['type'] == 'image'][0]
         return prompt, image
 
-    def get_send_data(self,prompt, image_path, temperature, max_tokens,stream=False,understanding_plus=False):
+    def get_send_data(self, prompt, image_path, temperature, max_tokens, stream=False):
         image = ''
         with open(image_path, 'rb') as f:
             image = str(base64.b64encode(f.read()), 'utf-8')
@@ -169,12 +169,11 @@ class JTVLChatWrapper(BaseAPI):
             "max_tokens": max_tokens,
             "temperature": temperature,
             "do_sample": False,
-            "understanding_plus":understanding_plus,
             "stream": stream
         }
         return send_data
 
-    def get_send_data_no_image(self,prompt, temperature, max_tokens, stream=False,understanding_plus=False):
+    def get_send_data_no_image(self, prompt, temperature, max_tokens, stream=False):
         send_data = {
             "messages": [
                 {
@@ -185,7 +184,6 @@ class JTVLChatWrapper(BaseAPI):
             "max_tokens": max_tokens,
             "temperature": temperature,
             "stream": stream,
-            "understanding_plus":understanding_plus
         }
         return send_data
 
@@ -211,9 +209,9 @@ class JTVLChatWrapper(BaseAPI):
 
         json_data = json.dumps(send_data)
 
-        header_dict = {'Content-Type': 'application/json','Authorization': 'Bearer ' + self.app_code}
+        header_dict = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + self.app_code}
 
-        r = requests.post(self.api_base, headers=header_dict, data=json_data, timeout=3000,stream=True)
+        r = requests.post(self.api_base, headers=header_dict, data=json_data, timeout=3000, stream=True)
         try:
             if send_data.get('stream', False):
                 # 流式处理
@@ -247,16 +245,16 @@ class JTVLChatWrapper(BaseAPI):
                                     continue
                     print("\n")  # 换行
 
-                    return 0,full_content,'Succeeded! '
+                    return 0, full_content, 'Succeeded! '
 
                 except Exception as e:
-                    return -1,f'Error: {str(e)}',''
+                    return -1, f'Error: {str(e)}', ''
             else:
                 # 非流式处理
                 try:
                     r_json = r.json()
                     output = r_json['choices'][0]['message']['content']
-                    return 0,output,'Succeeded! '
+                    return 0, output, 'Succeeded! '
                 except:
                     error_msg = f'Error! code {r.status_code} content: {r.content}'
                     error_con = r.content.decode('utf-8')
@@ -264,12 +262,12 @@ class JTVLChatWrapper(BaseAPI):
                         self.logger.error(error_msg)
                         self.logger.error(error_con)
                         self.logger.error(f'The input messages are {inputs}.')
-                    return -1,error_msg,''
+                    return -1, error_msg, ''
         except Exception as e:
-            return -1,f'Error: {str(e)}',''
+            return -1, f'Error: {str(e)}', ''
 
 
-class JTVLChatAPI(JTVLChatWrapper):
+class JTVLChatAPI_Mini(JTVLChatWrapper):
 
     def generate(self, message, dataset=None):
-        return super(JTVLChatAPI, self).generate(message, dataset=dataset)
+        return super(JTVLChatAPI_Mini, self).generate(message, dataset=dataset)

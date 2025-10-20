@@ -431,6 +431,7 @@ api_models = {
     "BlueLM-2.5-3B": partial(BlueLM_API, model="BlueLM-2.5-3B", temperature=0, retry=3),
     # JiuTian-VL
     "JTVL": partial(JTVLChatAPI, model="jt-vl-chat", temperature=0, retry=10),
+    "JTVL-Mini": partial(JTVLChatAPI_Mini, model="jt-vl-chat-mini", temperature=0, retry=10),
     "Taiyi": partial(TaiyiAPI, model="taiyi", temperature=0, retry=10),
     # TeleMM
     "TeleMM": partial(TeleMMAPI, model="TeleAI/TeleMM", temperature=0, retry=10),
@@ -720,8 +721,17 @@ llava_series = {
     "llava_video_qwen2_72b": partial(
         LLaVA_OneVision, model_path="lmms-lab/LLaVA-Video-72B-Qwen2"
     ),
+}
+
+varco_vision_series = {
     "varco-vision-hf": partial(
         LLaVA_OneVision_HF, model_path="NCSOFT/VARCO-VISION-14B-HF"
+    ),
+    "varco-vision-2-1.7b": partial(
+        VarcoVision, model_path="NCSOFT/VARCO-VISION-2.0-1.7B"
+    ),
+    "varco-vision-2-14b": partial(
+        VarcoVision, model_path="NCSOFT/VARCO-VISION-2.0-14B"
     ),
 }
 
@@ -1528,7 +1538,7 @@ model_groups = [
     aria_series, smolvlm_series, sail_series, valley_series, vita_series,
     ross_series, emu_series, ola_series, ursa_series, gemma_series,
     long_vita_series, ristretto_series, kimi_series, aguvis_series, hawkvl_series, 
-    flash_vl, kimi_vllm_series, oryx_series, treevgr_series
+    flash_vl, kimi_vllm_series, oryx_series, treevgr_series, varco_vision_series
 ]
 
 for grp in model_groups:
